@@ -13,6 +13,7 @@ const {vlog , User } = require('./db');
 app.post('/signup', async(req,res)=>{
     const {username,password} = req.body;
 
+// validation 
     if(!username|| !password || username.trim()===''|| password.trim()===''){
        return res.status(403).json({
         msg:"Username or Password is empty"
