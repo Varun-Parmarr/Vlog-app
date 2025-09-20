@@ -1,7 +1,7 @@
 
 const moongoose = require('mongoose');
  
-moongoose.connect('mongodb+srv://Admin:1ffePwbIjn8z99kp@cluster0.blucicy.mongodb.net/vloggs')
+moongoose.connect('mongodb+srv://Admin:sphzlAM0ikoPGtiR@cluster0.blucicy.mongodb.net/vloggs')
 
 const vlogSchema = new moongoose.Schema({
     title: String,

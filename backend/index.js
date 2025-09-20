@@ -4,7 +4,7 @@ const app = express();
 app.use(express.json());
 const bcrypt = require('bcrypt'); // for hash password 
 const jwt = require('jsonwebtoken'); // For authentication
-const SECRET_KEY = "secret123";  //JWT password
+const SECRET_KEY = "secret321";  //JWT password
 const {createVlog} = require('./mytype');
 const {vlog , User } = require('./db');
 
@@ -12,6 +12,12 @@ const {vlog , User } = require('./db');
 //Signup page
 app.post('/signup', async(req,res)=>{
     const {username,password} = req.body;
+
+    if(!username|| !password || username.trim()===''|| password.trim()===''){
+       return res.status(403).json({
+        msg:"Username or Password is empty"
+       })
+    }
 
     const Userexists = await User.findOne({username});
     if (Userexists){
