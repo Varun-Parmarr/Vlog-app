@@ -1,10 +1,20 @@
 
-const moongoose = require('mongoose');
+const mongoose = require('mongoose');
  
-moongoose.connect('mongodb+srv://Admin:sphzlAM0ikoPGtiR@cluster0.blucicy.mongodb.net/vloggs')
+const MongoURL = process.env.MONGO_URI;
 
+const connectDB = async ()=>{
 
-const vlogSchema = new moongoose.Schema({
+    try {
+        await mongoose.connect(MongoURL);
+        console.log("MongoDB connected successfully");
+    }
+    catch (err){
+        console.log("MongoDB connection failed", err);
+    }
+}
+
+const vlogSchema = new mongoose.Schema({
     title: String,
     content: String,
     authorname: String,
@@ -14,9 +24,9 @@ const vlogSchema = new moongoose.Schema({
     }
 });
 
-const vlog = moongoose.model('vlog', vlogSchema);
+const vlog = mongoose.model('vlog', vlogSchema);
 
-const userschema = new moongoose.Schema({
+const userschema = new mongoose.Schema({
     username: String,
     password: String,
     createdAt: {
@@ -25,6 +35,6 @@ const userschema = new moongoose.Schema({
     }
 });
 
-const User = moongoose.model('User', userschema);
+const User = mongoose.model('User', userschema);
 
-module.exports = {vlog , User};
+module.exports = {connectDB ,vlog , User};

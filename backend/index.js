@@ -1,13 +1,20 @@
-
+require('dotenv').config();
 const express = require('express');
 const app = express();
 app.use(express.json());
 const bcrypt = require('bcrypt'); // for hash password 
 const jwt = require('jsonwebtoken'); // For authentication
-const SECRET_KEY = "secret321";  //JWT password
+const PORT = process.env.PORT || 4000;
+const SECRET_KEY = process.env.JWT_KEY; // JWT secret key
 const {createVlog} = require('./mytype');
-const {vlog , User } = require('./db');
+const {connectDB, vlog , User } = require('./db');
+const cors = require('cors');
 
+connectDB();
+
+app.use(cors({
+    origin:'http://localhost:5173'
+}))
 
 //Signup page
 app.post('/signup', async(req,res)=>{
@@ -148,6 +155,6 @@ jwt.verify(token , SECRET_KEY,(err,user)=>{
   })
 
 app.listen(4000, () => {
-  console.log("Server running on http://localhost:4000");
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 
