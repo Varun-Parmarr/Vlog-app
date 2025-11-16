@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken'); // For authentication
 const PORT = process.env.PORT || 4000;
 const SECRET_KEY = process.env.JWT_KEY; // JWT secret key
 const {createVlog} = require('./mytype');
-const {connectDB, vlog , User } = require('./db');
+const {connectDB, Media , User, Review } = require('./db');
 const cors = require('cors');
 
 connectDB();
@@ -35,17 +35,21 @@ app.post('/signup', async(req,res)=>{
     }
     //hash password 
     const hashedpassword = await bcrypt.hash(password,10);
-   await User.create({
+    const newUser =await User.create({
         username,
         password:hashedpassword
    })
+
+   const token= jwt.sign({UserId: newUser._id},SECRET_KEY,{expiresIn:'1h'});
+
    res.json ({
     msg:"User created successfully"
    })
 });
-// login page 
 
+// login page 
 app.post('/login', async(req,res)=>{
+    try {
     const {username,password} = req.body;
 
     const Founduser= await User.findOne({username});
@@ -63,16 +67,26 @@ app.post('/login', async(req,res)=>{
         msg:"Invalid username name is entered"
        })
     }
-    // generate JWT token
-    const token= jwt.sign({UserId: User._id},SECRET_KEY,{expiresIn:'1h'});
+
+   // generate JWT token
+    const token= jwt.sign({UserId: Founduser._id},SECRET_KEY,{expiresIn:'1h'});
 
     res.json({ token });
 
+
+} catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({
+        msg:"Server Error",
+        error: error.message
+       })
+}
+    
 })
 // Middleware for authentication
  function authMiddleware(req,res,next){
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.Split('')[1];
+    const token = authHeader && authHeader.split(' ')[1];
 
 if(!token){
     return res.status(401).json({
@@ -91,8 +105,10 @@ jwt.verify(token , SECRET_KEY,(err,user)=>{
     next();
 })
 }
-// Create a vlog
- app.post('/vlogs', authMiddleware, async(req,res)=>{
+
+// Create a Media
+ app.post('/api/media', authMiddleware, async(req,res)=>{
+    try{
     const createpayload = req.body;
     const parsepayload = createVlog.safeParse(createpayload);
     if (!parsepayload.success){
@@ -102,57 +118,132 @@ jwt.verify(token , SECRET_KEY,(err,user)=>{
         return;
     }
     
+    const UserID= req.user.UserId;
+
     // database
-    await vlog.create({
+    await Media.create({
         title:createpayload.title,
         content:createpayload.content,
-        authorname:createpayload.authorname,
-        createdAt: new Date()
+        imageURL:createpayload.imageURL,
+        type:createpayload.type,
+        addedBy: UserID,
 
     })
     res.json({
-        msg:"Vlog Created Successfully"
+        msg:"Media Created Successfully"
     })
+}
+    catch(err){
+        res.status(500).json({
+            msg:"Server Error"
+        })
+    }
 
  })
 
-  app.get('/vlogs', async(req,res)=>{
+  app.get('/api/media', async(req,res)=>{
     try{
-    const vlogs = await vlog.find({});
-    res.json(vlogs);}
+    const allMedia = await Media.find({})
+    .populate('addedBy','username');
+
+    res.status(200).json(allMedia);
+  }
     catch(err){
+        console.error("Error in getAllMediaItems:", error);
         res.status(500).json({
             msg:"Server Error"
         })
     }
   })
 
-  app.get('/vlogs/author/:name',async(req,res)=>{
-   
+  //search media by title
+  app.get('/api/media/search', async(res,req)=>{
+ 
     try{
-        const name = req.params.name;
-        const singlevlog = await vlog.findOne({authorname:name});
-        res.json(singlevlog);
+       const title= req.query.title;
+
+       const mediaItems = await Media.find({
+        title: { $regex: title, $options: 'i' }
+       })
+
+       if(mediaItems.length===0){
+        return res.status(404).json({
+            msg:"No item found"
+        })
+       }
+
+         res.status(200).json(mediaItems);
+
     }
     catch(err){
-        res.status(404).json({
-            msg:" vlog with the name ${name} not found"
+        res.status(500).json({
+            msg:"Server Error"
         })
     }
-  })
 
-  app.put('/vlogs/:id', async (res,req)=>{
+})
+
+  // Review section
+
+  app.post('/review/:mediaId',authMiddleware,async(req,res)=>{
+
+    const {rating,comment}= req.body;
+  //validation
+    if(!rating || rating <1 || rating >5|| comment.trim()===''){
+        return res.status(400).json({
+            msg:"Invalid rating value"
+        })
+    }
+    
     try{
-        const id = req.params.id;
-        const updatepayload = req.body;
-        const parsepayload = createVlog.safeParse(updatepayload);
-  }
-  catch(err){
-    res.status(404).json({
-        msg:" vlog with the id ${id} not found"
+    const mediaId = req.params.mediaId;
+    const userId = req.user.UserId;
+
+    // check if media exists
+    const MediaExists = await Media.findById(mediaId);
+    if(!MediaExists){
+        return res.status(404).json({
+            msg:"Media not found"
+        })
+    }
+    await Review.create({
+        rating,
+        comment:comment.trim(),
+        user: userId,
+        media: mediaId
+    });
+
+    res.status(201).json({
+        msg:"Review added successfully"
     })
-  }
-  })
+}
+    catch(err){
+        res.status(500).json({
+            msg:"Server Error"
+        })
+    }
+});
+
+// Get reviews for a media item
+app.get('/review/:mediaId', async(req,res)=>{
+    try{
+    const mediaId = req.params.mediaId;
+
+    const reviews = await Review.find({media:mediaId})
+    .populate('user','username')
+    .select( 'rating comment user')
+    .sort({createdAt:-1})
+
+    res.status(200).json(reviews);
+
+ }
+
+  catch(err){
+        res.status(500).json({
+            msg:"Server Error"
+        })
+    }
+});
 
 app.listen(4000, () => {
   console.log(`Server running on http://localhost:${PORT}`);
