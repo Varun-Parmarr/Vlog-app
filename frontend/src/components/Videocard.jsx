@@ -146,17 +146,17 @@ export default function Videocard() {
       
      
        {/* Media Grid (visible to everyone) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 m-8 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 ml-12 mr-12 gap-8">
         {items.map((item) => (
           <div
             key={item._id}
             onClick={() => setSelectedItem(item)}
-            className="relative cursor-pointer rounded-lg overflow-hidden shadow-md hover:scale-105 transform transition-transform duration-300"
+            className="relative cursor-pointer rounded-lg overflow-hidden hover:scale-110 transform transition-transform duration-300 shadow-2xl"
           >
             <img
               src={item.imageURL}
               alt={item.title}
-              className="w-full h-64 object-cover"
+              className="w-full h-64 shadow-lg object-cover"
             />
             <div className="absolute bottom-0 bg-black bg-opacity-60 w-full text-white p-2 text-center">
               {item.title}
@@ -182,7 +182,7 @@ export default function Videocard() {
       {/* Review Modal (only logged-in users can submit) */}
       {selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md relative p-6 overflow-auto max-h-[90vh]">
+          <div className="bg-gray-300 rounded-lg shadow-lg w-full max-w-md relative p-6 overflow-auto max-h-[90vh]">
             <button
               onClick={() => setSelectedItem(null)}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl"

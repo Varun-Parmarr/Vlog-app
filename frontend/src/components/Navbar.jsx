@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import SearchBar from './Searchbar';
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,7 +43,18 @@ export default function Navbar() {
   };
 
   return (
-    <div className="flex justify-end border border-style:solid shadow:2xl space-x-5 p-2">
+    <div className="flex justify-between border border-style:solid shadow:3xl space-x-4 p-1">
+      
+     <div >
+      <h1 className="text-2xl font-bold text-gray-800 p-2">BingeJudge</h1>
+     </div>
+     
+     <div className='space-x-5 pt-2 w-full max-w-md'>
+      <SearchBar/>
+      </div>
+
+
+     <div className='flex items-center space-x-5'>
       <div>
         <Link to="/about" className=" p-2">About</Link>
       </div>
@@ -78,6 +90,7 @@ export default function Navbar() {
           </div>
         </>
       )}
+    </div>
     </div>
   );
 }

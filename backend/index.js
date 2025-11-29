@@ -107,13 +107,32 @@ jwt.verify(token , SECRET_KEY,(err,user)=>{
 }
 
 // Create a Media
- app.post('/api/media', authMiddleware, async(req,res)=>{
+ 
+
+  app.get('/api/media', async(req,res)=>{
+    try{
+    const allMedia = await Media.find({})
+    .populate('addedBy','username');
+
+    res.status(200).json(allMedia);
+  }
+    catch(err){
+        console.error("Error in getAllMediaItems:", error);
+        res.status(500).json({
+            msg:"Server Error"
+        })
+    }
+  })
+
+  app.post('/api/media', authMiddleware, async(req,res)=>{
+    console.log('Received body:', req.body);
     try{
     const createpayload = req.body;
     const parsepayload = createVlog.safeParse(createpayload);
     if (!parsepayload.success){
         res.status(411).json({
-            msg:"Invalid Input"
+            msg:"Invalid Input",
+            errors: parsepayload.error.flatten().fieldErrors
         })
         return;
     }
@@ -141,30 +160,15 @@ jwt.verify(token , SECRET_KEY,(err,user)=>{
 
  })
 
-  app.get('/api/media', async(req,res)=>{
-    try{
-    const allMedia = await Media.find({})
-    .populate('addedBy','username');
-
-    res.status(200).json(allMedia);
-  }
-    catch(err){
-        console.error("Error in getAllMediaItems:", error);
-        res.status(500).json({
-            msg:"Server Error"
-        })
-    }
-  })
-
   //search media by title
-  app.get('/api/media/search', async(res,req)=>{
+  app.get('/api/media/search', async(req,res)=>{
  
     try{
        const title= req.query.title;
 
        const mediaItems = await Media.find({
         title: { $regex: title, $options: 'i' }
-       })
+       }).select('title _id')
 
        if(mediaItems.length===0){
         return res.status(404).json({
