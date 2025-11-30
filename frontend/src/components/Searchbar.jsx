@@ -31,8 +31,10 @@ export default function SearchBar() {
     setError(null);
 
     try {
-     
-      const response = await fetch(`http://localhost:4000/api/media/search?title=${encodeURIComponent(searchTitle)}`);
+       
+      const API_URL = import.meta.env.VITE_API_URL;
+
+     const response = await fetch(`${API_URL}/api/media/search?title=${encodeURIComponent(searchTitle)}`);
 
       
       if (response.status === 404) {

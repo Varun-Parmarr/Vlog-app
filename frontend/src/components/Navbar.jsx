@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -45,9 +44,10 @@ export default function Navbar() {
   return (
     <div className="flex justify-between border border-style:solid shadow:3xl space-x-4 p-1">
       
-     <div >
-      <h1 className="text-2xl font-bold text-gray-800 p-2">BingeJudge</h1>
-     </div>
+     <h1 className="text-3xl p-3 text-gray-900 hover:opacity-80 transition-opacity">
+         <span className="font-extrabold">Binge</span>
+         <span>Judge</span>
+     </h1>
      
      <div className='space-x-5 pt-2 w-full max-w-md'>
       <SearchBar/>

@@ -3,6 +3,9 @@ import axios from "axios";
 import {jwtDecode} from "jwt-decode";
 
 export default function Videocard() {
+
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -39,7 +42,7 @@ export default function Videocard() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/media");
+        const res = await axios.get(`${API_URL}/api/media`);
         setItems(res.data);
       } catch (err) {
         console.error("Error fetching media:", err.response ? err.response.data : err.message);
@@ -63,7 +66,7 @@ export default function Videocard() {
   }
 
     try {
-      await axios.post("http://localhost:4000/api/media", {
+      await axios.post(`${API_URL}/api/media`, {
         title: newTitle,
         type: newType,
         content: newDescription,
@@ -83,7 +86,7 @@ export default function Videocard() {
       setNewDescription("");
       setNewImageURL("");
       // Refresh media list
-      const res = await axios.get("http://localhost:4000/api/media");
+       const res = await axios.get(`${API_URL}/api/media`);
       setItems(res.data);
     } catch (error) {
       console.error("Error adding media:", error.response ? error.response.data : error.message);
@@ -112,9 +115,8 @@ export default function Videocard() {
       const mediaId = selectedItem._id;
 
       // 2. Create the URL that matches your backend
-      // e.g., "http://localhost:4000/review/60f8f1b9e...
 
-      await axios.post(`http://localhost:4000/review/${mediaId}`, {
+      await axios.post(`${API_URL}/review/${mediaId}`, {
         rating,
         comment
       },
@@ -158,9 +160,9 @@ export default function Videocard() {
               alt={item.title}
               className="w-full h-64 shadow-lg object-cover"
             />
-            <div className="absolute bottom-0 bg-black bg-opacity-60 w-full text-white p-2 text-center">
-              {item.title}
-            </div>
+            <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent">
+            <h3 className="text-white font-bold text-lg">{item.title}</h3>
+           </div>
           </div>
         ))}
       </div>
