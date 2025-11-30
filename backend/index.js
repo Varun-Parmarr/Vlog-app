@@ -13,7 +13,8 @@ const cors = require('cors');
 connectDB();
 
 app.use(cors({
-    origin:'http://localhost:5173'
+    origin:['http://localhost:5173',
+    "https://binge-judge.vercel.app"],
 }))
 
 //Signup page
