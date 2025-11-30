@@ -15,7 +15,10 @@ function SignIn() {
     const dataToSend = { username, password };
 
     try {
-      const response = await axios.post('http://localhost:4000/signup', dataToSend);
+
+     const API_URL = import.meta.env.VITE_API_URL;
+     const response = await axios.post(`${API_URL}/signup`, dataToSend);
+
       console.log("SIGNIN SUCCESSFUL", response.data);
 
 

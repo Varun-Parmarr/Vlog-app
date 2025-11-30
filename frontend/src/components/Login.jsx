@@ -16,7 +16,11 @@ function Login() {
      
 
     try {
-      const response = await axios.post('http://localhost:4000/login', dataToSend);
+
+     const API_URL = import.meta.env.VITE_API_URL;
+
+      const response = await axios.post(`${API_URL}/login`, dataToSend);
+
       console.log("LOGIN SUCCESSFUL", response.data);
 
      localStorage.setItem('token', response.data.token);
