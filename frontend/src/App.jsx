@@ -2,8 +2,8 @@
 import  SignIn from './components/SignIn';
 import  Login  from './components/Login';
 import { Routes , Route , BrowserRouter} from 'react-router-dom';
-import About from './components/about';
-import MainPage from './components/main';
+import About from './components/AboutPage';
+import MainPage from './components/MainPage';
 
 
 function App() {
